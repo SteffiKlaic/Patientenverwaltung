@@ -7,7 +7,7 @@ int id = 1;
 
 while (true)
 {
-    Console.WriteLine("Gib 1 ein, um einen Patienten anzulegen, 2 um alle Patienten anzuzeigen 3 um einen Patienten zu löschen und 4 um zu beenden.");
+    Console.WriteLine("Gib 1 ein, um einen Patienten anzulegen, 2 um alle Patienten anzuzeigen 3 um einen Patienten zu bearbeiten, 4 um einen Patienten zu löschen und 5 um zu beenden.\n");
     string auswahl = Console.ReadLine();
 
 
@@ -17,9 +17,9 @@ while (true)
             LegePatientenAn(patientenListe);
             break;
         case "2":
-            if(patientenListe.Count == 0)
+            if (patientenListe.Count == 0)
             {
-                Console.WriteLine("Patientenliste leer - bitte legen Sie einen Patienten an.");
+                Console.WriteLine("Patientenliste leer - bitte legen Sie einen Patienten an.\n");
             }
             else
             {
@@ -27,57 +27,123 @@ while (true)
             }
             break;
         case "3":
-            LoeschePatienten(patientenListe);
+            BearbeitePatienten(patientenListe);
             break;
         case "4":
-            Console.WriteLine("Programm beendet.");
+            LoeschePatienten(patientenListe);
+            break;
+        case "5":
+            Console.WriteLine("Programm beendet.\n");
             return;
 
         default:
-            Console.WriteLine("Falscher Wert.");
+            Console.WriteLine("Falscher Wert.\n");
             break;
     }
 }
 
 
-
 void LegePatientenAn(List<Patient> patientenListe)
 {
-   
-    Console.Write("Bitte gib den Namen des Patienten an: ");
+
+    Console.Write("Bitte gib den Namen des Patienten an:\n");
     string name = Console.ReadLine();
 
-    Console.Write("Bitte gib das Geburtsdatum des Patienten an: ");
+    Console.Write("Bitte gib das Geburtsdatum des Patienten an:\n");
     DateTime geburtsdatum = Convert.ToDateTime(Console.ReadLine());
 
-    Console.Write("Bitte gib die Sozialversicherungsnummer des Patienten an: ");
+    Console.Write("Bitte gib die Sozialversicherungsnummer des Patienten an:\n");
     int versicherungsnummer = Convert.ToInt32(Console.ReadLine());
 
-    Patient patient = new Patient {Id = id++, Name = name, Geburtsdatum = geburtsdatum, Versicherungsnummer = versicherungsnummer };
+    Patient patient = new Patient { Id = id++, Name = name, Geburtsdatum = geburtsdatum, Versicherungsnummer = versicherungsnummer };
     patientenListe.Add(patient);
 
-    Console.WriteLine($"Patient {patient.Name} wurde erfolgreich angelegt.");
+    Console.WriteLine($"Patient {patient.Name} wurde erfolgreich angelegt.\n");
 }
 
 void ZeigePatientenAn(List<Patient> patientenListe)
 {
     foreach (Patient patient in patientenListe)
     {
-        Console.WriteLine($"ID: {patient.Id} Name: {patient.Name} Geburtsdatum: {patient.Geburtsdatum:dd.MM.yyyy} Sozialversicherungsnummer: {patient.Versicherungsnummer}");
+        Console.WriteLine($"ID: {patient.Id} Name: {patient.Name} Geburtsdatum: {patient.Geburtsdatum:dd.MM.yyyy} Sozialversicherungsnummer: {patient.Versicherungsnummer}\n");
     }
 }
 
 void LoeschePatienten(List<Patient> patientenListe)
 {
-    Console.WriteLine("Welche Id soll gelöscht werden?");
+    Console.WriteLine("Welche ID soll gelöscht werden?\n");
     int id = Convert.ToInt32(Console.ReadLine());
 
     Patient p = patientenListe.Find(x => x.Id == id);
 
-    if(p != null)
+    if (p != null)
     {
         patientenListe.Remove(p);
     }
 
-    Console.WriteLine($"Patient {p.Name}, mit der ID: {p.Id} wurde erfolgreich gelöscht.");
+    Console.WriteLine($"Patient {p.Name}, mit der ID: {p.Id} wurde erfolgreich gelöscht.\n");
 }
+
+void BearbeitePatienten(List<Patient> patientenListe)
+{
+    Console.WriteLine("Bitte gebe die ID von dem zu bearbeitenden Patienten an:\n");
+    int id = Convert.ToInt32(Console.ReadLine());
+
+    Patient p = patientenListe.Find(x => x.Id == id);
+
+    if (p != null)
+    {
+            Console.WriteLine("Gib 1 ein, um den Namen zu bearbeiten, 2 um das Geburtsdatum zu bearbeiten und 3 um die Sozialversicherungsnummer zu bearbeiten.\n");
+            string auswahl = Console.ReadLine();
+
+            switch (auswahl)
+            {
+                case "1":
+                    BearbeiteNamen(patientenListe);
+                    break;
+                case "2":
+                    BearbeiteGeburtstag(patientenListe);
+                    break;
+                case "3":
+                    BearbeiteSozialversicherung(patientenListe);
+                    break;
+                case "4":
+                    Console.WriteLine("Programm beendet.");
+                    return;
+            }
+        
+    }
+
+    void BearbeiteNamen(List<Patient> patientenListe)
+    {
+        Console.WriteLine($"Alter Name: {p.Name}\n");
+
+        Console.WriteLine("Bitte gib den neuen Namen des Patienten an:\n");
+        string name = Console.ReadLine();
+        p.Name = name;
+        Console.WriteLine("Der Name des Patienten wurde erfolgreich geändert!\n");
+    }
+
+    void BearbeiteGeburtstag(List<Patient> patientenListe)
+    {
+        Console.WriteLine($"Altes Geburtsdatum: {p.Geburtsdatum}\n");
+
+        Console.WriteLine("Bitte gib das neue Geburtsdatum des Patienten an:\n");
+        DateTime geburtsdatum = Convert.ToDateTime(Console.ReadLine());
+        p.Geburtsdatum = geburtsdatum;
+
+        Console.WriteLine("Das Geburtsdatum des Patienten wurde erfolgreich geändert!\n");
+    }
+
+    void BearbeiteSozialversicherung(List<Patient> patientenListe)
+    {
+        Console.WriteLine($"Alte Sozialversicherungsnummer des Patienten: {p.Versicherungsnummer}\n");
+
+        Console.WriteLine("Bitte gib die neue Sozialversicherungsnummer des Patienten an:\n");
+        int versicherungsnummer = Convert.ToInt32(Console.ReadLine());
+        p.Versicherungsnummer = versicherungsnummer;
+
+        Console.WriteLine("Die Sozialversicherungsnummer des Patienten wurde erfolgreich geändert!\n");
+    }
+}
+
