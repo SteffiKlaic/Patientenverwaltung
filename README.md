@@ -7,6 +7,7 @@ Funktionen
 * Patienten hinzufügen
 * Patienten anzeigen
 * Patienten bearbeiten
+* Patienten suchen
 * Patienten löschen
 
 Technologien
