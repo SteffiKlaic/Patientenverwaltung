@@ -1,5 +1,7 @@
 ﻿using MiniPatientenVerwaltung;
 using System;
+using System.Diagnostics.Metrics;
+using System.Xml.Linq;
 
 List<Patient> patientenListe = new List<Patient>();
 int id = 1;
@@ -7,7 +9,7 @@ int id = 1;
 
 while (true)
 {
-    Console.WriteLine("Gib 1 ein, um einen Patienten anzulegen, 2 um alle Patienten anzuzeigen 3 um einen Patienten zu bearbeiten, 4 um einen Patienten zu löschen und 5 um zu beenden.\n");
+    Console.WriteLine("Gib 1 an, um einen Patienten anzulegen, 2 um alle Patienten anzuzeigen 3 um einen Patienten zu bearbeiten, 4 um einen Patienten zu suchen, 5 um einen Patienten zu löschen und 6 um zu das Programm zu beenden.\n");
     string auswahl = Console.ReadLine();
 
 
@@ -30,9 +32,12 @@ while (true)
             BearbeitePatienten(patientenListe);
             break;
         case "4":
-            LoeschePatienten(patientenListe);
+            SuchePatienten(patientenListe);
             break;
         case "5":
+            LoeschePatienten(patientenListe);
+            break;
+        case "6":
             Console.WriteLine("Programm beendet.\n");
             return;
 
@@ -41,7 +46,6 @@ while (true)
             break;
     }
 }
-
 
 void LegePatientenAn(List<Patient> patientenListe)
 {
@@ -69,49 +73,43 @@ void ZeigePatientenAn(List<Patient> patientenListe)
     }
 }
 
-void LoeschePatienten(List<Patient> patientenListe)
-{
-    Console.WriteLine("Welche ID soll gelöscht werden?\n");
-    int id = Convert.ToInt32(Console.ReadLine());
-
-    Patient p = patientenListe.Find(x => x.Id == id);
-
-    if (p != null)
-    {
-        patientenListe.Remove(p);
-    }
-
-    Console.WriteLine($"Patient {p.Name}, mit der ID: {p.Id} wurde erfolgreich gelöscht.\n");
-}
-
 void BearbeitePatienten(List<Patient> patientenListe)
 {
-    Console.WriteLine("Bitte gebe die ID von dem zu bearbeitenden Patienten an:\n");
+    Console.WriteLine("Bitte gib die ID von dem zu bearbeitenden Patienten an:\n");
     int id = Convert.ToInt32(Console.ReadLine());
 
     Patient p = patientenListe.Find(x => x.Id == id);
 
     if (p != null)
     {
-            Console.WriteLine("Gib 1 ein, um den Namen zu bearbeiten, 2 um das Geburtsdatum zu bearbeiten und 3 um die Sozialversicherungsnummer zu bearbeiten.\n");
-            string auswahl = Console.ReadLine();
+        Console.WriteLine("Gib 1 an, um den Namen zu bearbeiten, 2 um das Geburtsdatum zu bearbeiten, 3 um die Sozialversicherungsnummer zu bearbeiten und 4 um das Programm zu beenden.\n");
+        string auswahl = Console.ReadLine();
 
-            switch (auswahl)
-            {
-                case "1":
-                    BearbeiteNamen(patientenListe);
-                    break;
-                case "2":
-                    BearbeiteGeburtstag(patientenListe);
-                    break;
-                case "3":
-                    BearbeiteSozialversicherung(patientenListe);
-                    break;
-                case "4":
-                    Console.WriteLine("Programm beendet.");
-                    return;
-            }
-        
+        switch (auswahl)
+        {
+            case "1":
+                BearbeiteNamen(patientenListe);
+                break;
+            case "2":
+                BearbeiteGeburtstag(patientenListe);
+                break;
+            case "3":
+                BearbeiteSozialversicherung(patientenListe);
+                break;
+            case "4":
+                Console.WriteLine("Programm beendet.\n");
+                return;
+            default:
+                Console.WriteLine("Falscher Wert.\n");
+                break;
+        }
+
+
+    }
+
+    else
+    {
+        Console.WriteLine("Patient nicht gefunden.\n");
     }
 
     void BearbeiteNamen(List<Patient> patientenListe)
@@ -146,4 +144,95 @@ void BearbeitePatienten(List<Patient> patientenListe)
         Console.WriteLine("Die Sozialversicherungsnummer des Patienten wurde erfolgreich geändert!\n");
     }
 }
+void SuchePatienten(List<Patient> patientenListe)
+{
+
+    Console.WriteLine("Gib 1 an um nach dem Namen des Patienten zu suchen, 2 um nach der Sozialversicherungsnummer des Patienten zu suchen und 3 um das Programm zu beenden.\n");
+    string auswahl = Console.ReadLine();
+
+    switch (auswahl)
+    {
+        case "1":
+            SucheNamen(patientenListe);
+            break;
+        case "2":
+            SucheSozialversicherung(patientenListe);
+            break;
+        case "3":
+            Console.WriteLine("Programm beendet.\n");
+            return;
+        default:
+            Console.WriteLine("Falscher Wert.\n");
+            break;
+    }
+
+    void SucheNamen(List<Patient> patientenListe)
+    {
+        Console.WriteLine("Bitte gib den Namen des Patienten an, nach dem du suchen möchtest:\n");
+        string name = Console.ReadLine();
+
+        List<Patient> patient = patientenListe
+        .Where(p => p.Name.StartsWith(name, StringComparison.OrdinalIgnoreCase))
+        .ToList();
+
+        if (patient.Count != 0)
+        {
+            foreach (var p in patient)
+            {
+                Console.WriteLine($"{p.Id}, {p.Name}, {p.Geburtsdatum}, {p.Versicherungsnummer}");
+            }
+
+        }
+
+        else
+        {
+            Console.WriteLine("Patient nicht gefunden.\n");
+        }
+
+    }
+
+    void SucheSozialversicherung(List<Patient> patientenListe)
+    {
+        Console.WriteLine("Bitte gib die Sozialversicherungsnummer des Patienten an, nach dem du suchen möchtest:\n");
+        int versicherungsnummer = Convert.ToInt32(Console.ReadLine());
+
+        List<Patient> patient = patientenListe
+       .Where(p => p.Versicherungsnummer.ToString().StartsWith(versicherungsnummer.ToString(), StringComparison.OrdinalIgnoreCase))
+       .ToList();
+
+        if (patient.Count != 0)
+        {
+            foreach (var p in patient)
+            {
+                Console.WriteLine($"{p.Id}, {p.Name}, {p.Geburtsdatum}, {p.Versicherungsnummer}");
+            }
+
+        }
+
+        else
+        {
+            Console.WriteLine("Patient nicht gefunden.\n");
+        }
+
+    }
+
+}
+
+void LoeschePatienten(List<Patient> patientenListe)
+{
+    Console.WriteLine("Welche ID soll gelöscht werden?\n");
+    int id = Convert.ToInt32(Console.ReadLine());
+
+    Patient p = patientenListe.Find(x => x.Id == id);
+
+    if (p != null)
+    {
+        patientenListe.Remove(p);
+    }
+
+    Console.WriteLine($"Patient {p.Name}, mit der ID: {p.Id} wurde erfolgreich gelöscht.\n");
+}
+
+
+
 
