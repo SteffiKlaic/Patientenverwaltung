@@ -1,11 +1,10 @@
 ﻿using MiniPatientenVerwaltung;
 using System;
 using System.Diagnostics.Metrics;
+using System.Text.Json;
 using System.Xml.Linq;
 
-List<Patient> patientenListe = new List<Patient>();
-int id = 1;
-
+List<Patient> patientenListe = LadePatienten();
 
 while (true)
 {
@@ -38,9 +37,9 @@ while (true)
             LoeschePatienten(patientenListe);
             break;
         case "6":
+            SpeicherePatienten(patientenListe);
             Console.WriteLine("Programm beendet.\n");
             return;
-
         default:
             Console.WriteLine("Falscher Wert.\n");
             break;
@@ -49,6 +48,8 @@ while (true)
 
 void LegePatientenAn(List<Patient> patientenListe)
 {
+    int letzteId = patientenListe.Count > 0 ? patientenListe.Max(e => e.Id) : 0;
+    int neueId = letzteId + 1;
 
     Console.Write("Bitte gib den Namen des Patienten an:\n");
     string name = Console.ReadLine();
@@ -59,10 +60,11 @@ void LegePatientenAn(List<Patient> patientenListe)
     Console.Write("Bitte gib die Sozialversicherungsnummer des Patienten an:\n");
     int versicherungsnummer = Convert.ToInt32(Console.ReadLine());
 
-    Patient patient = new Patient { Id = id++, Name = name, Geburtsdatum = geburtsdatum, Versicherungsnummer = versicherungsnummer };
+    Patient patient = new Patient { Id = neueId, Name = name, Geburtsdatum = geburtsdatum, Versicherungsnummer = versicherungsnummer };
     patientenListe.Add(patient);
 
     Console.WriteLine($"Patient {patient.Name} wurde erfolgreich angelegt.\n");
+    SpeicherePatienten(patientenListe);
 }
 
 void ZeigePatientenAn(List<Patient> patientenListe)
@@ -97,13 +99,13 @@ void BearbeitePatienten(List<Patient> patientenListe)
                 BearbeiteSozialversicherung(patientenListe);
                 break;
             case "4":
+                SpeicherePatienten(patientenListe);
                 Console.WriteLine("Programm beendet.\n");
                 return;
             default:
                 Console.WriteLine("Falscher Wert.\n");
                 break;
         }
-
 
     }
 
@@ -120,6 +122,7 @@ void BearbeitePatienten(List<Patient> patientenListe)
         string name = Console.ReadLine();
         p.Name = name;
         Console.WriteLine("Der Name des Patienten wurde erfolgreich geändert!\n");
+        SpeicherePatienten(patientenListe);
     }
 
     void BearbeiteGeburtstag(List<Patient> patientenListe)
@@ -129,8 +132,9 @@ void BearbeitePatienten(List<Patient> patientenListe)
         Console.WriteLine("Bitte gib das neue Geburtsdatum des Patienten an:\n");
         DateTime geburtsdatum = Convert.ToDateTime(Console.ReadLine());
         p.Geburtsdatum = geburtsdatum;
-
         Console.WriteLine("Das Geburtsdatum des Patienten wurde erfolgreich geändert!\n");
+        SpeicherePatienten(patientenListe);
+
     }
 
     void BearbeiteSozialversicherung(List<Patient> patientenListe)
@@ -140,8 +144,8 @@ void BearbeitePatienten(List<Patient> patientenListe)
         Console.WriteLine("Bitte gib die neue Sozialversicherungsnummer des Patienten an:\n");
         int versicherungsnummer = Convert.ToInt32(Console.ReadLine());
         p.Versicherungsnummer = versicherungsnummer;
-
         Console.WriteLine("Die Sozialversicherungsnummer des Patienten wurde erfolgreich geändert!\n");
+        SpeicherePatienten(patientenListe);
     }
 }
 void SuchePatienten(List<Patient> patientenListe)
@@ -159,6 +163,7 @@ void SuchePatienten(List<Patient> patientenListe)
             SucheSozialversicherung(patientenListe);
             break;
         case "3":
+            SpeicherePatienten(patientenListe);
             Console.WriteLine("Programm beendet.\n");
             return;
         default:
@@ -231,8 +236,30 @@ void LoeschePatienten(List<Patient> patientenListe)
     }
 
     Console.WriteLine($"Patient {p.Name}, mit der ID: {p.Id} wurde erfolgreich gelöscht.\n");
+    SpeicherePatienten(patientenListe);
 }
 
+
+
+
+
+void SpeicherePatienten(List<Patient> patientenListe)
+{
+    string json = JsonSerializer.Serialize(patientenListe);
+    File.WriteAllText("patienten.json", json);
+}
+
+
+List<Patient> LadePatienten()
+{
+    if (File.Exists("patienten.json"))
+    {
+        string json = File.ReadAllText("patienten.json");
+        return JsonSerializer.Deserialize<List<Patient>>(json);
+    }
+
+    return new List<Patient>();
+}
 
 
 
